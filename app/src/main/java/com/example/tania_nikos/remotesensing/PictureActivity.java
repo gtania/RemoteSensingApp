@@ -13,6 +13,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -22,8 +23,8 @@ import java.util.Date;
 
 public class PictureActivity extends AppCompatActivity {
 
+    static final int REQUEST_IMAGE_CAPTURE = 1777;
     protected String mCurrentPhotoPath;
-    protected File photoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,42 +35,15 @@ public class PictureActivity extends AppCompatActivity {
         this.dispatchTakePictureIntent();
     }
 
-    static final int REQUEST_IMAGE_CAPTURE = 1777;
-
+    /**
+     * Open camera to take picture
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             Uri fileUri = getOutputMediaFileUri();
             takePictureIntent.putExtra( MediaStore.EXTRA_OUTPUT, fileUri );
             this.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//            File photoFile = null;
-//            try {
-//                System.out.println("just before create file");
-//
-//                photoFile = createImageFile();
-//                System.out.println("after file");
-//            } catch (IOException ex) {
-//                // Error occurred while creating the File
-//                System.out.println("in exception");
-//            }
-//            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//            String imageFileName = "JPEG_" + timeStamp + "_.jpg";
-//           // String imageFilePath = this.getExternalCacheDir() + "/"+ imageFileName;
-//            photoFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString(), imageFileName);
-//            Uri imageFileUri = Uri.fromFile(photoFile); // convert path to Uri
-//
-//            //mCurrentPhotoPath = imageFilePath;
-//            if (photoFile != null) {
-////                Uri photoURI = FileProvider.getUriForFile(this,
-////                        "com.example.tania_nikos.remotesensing.fileprovider",
-////                        photoFile);
-//               System.out.println("Image URL : " + imageFileUri);
-//
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
-//                System.out.println("just before start image thing");
-//
-//                this.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//            }
         }
     }
 
@@ -105,6 +79,13 @@ public class PictureActivity extends AppCompatActivity {
         return mediaFile;
     }
 
+    /**
+     * Habdle result after image has been captured
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         System.out.println("in result");
@@ -112,21 +93,9 @@ public class PictureActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            System.out.println("Got the FOTO HERE");
-//            imageView = (ImageView) findViewById(R.id.image);
-//            imageView.setImageBitmap(imageBitmap);
-//            galleryAddPic();
-//            setPic();
-            // Decode it for real
+
             ImageView imageView = (ImageView) findViewById(R.id.imageView4);
-
-            System.out.println("before decode");
             Bitmap bitmap = decodeSampledBitmapFromFile(mCurrentPhotoPath, imageView.getWidth(), imageView.getHeight());
-            System.out.println("after decode");
-
-            System.out.println("before show");
 
             try {
                 ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
@@ -162,74 +131,28 @@ public class PictureActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-
-
-
-
-//        //    BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-//           // bmpFactoryOptions.inJustDecodeBounds = false;
-//
-//            System.out.println("before file create");
-//
-//           // File imgFile = new  File(mCurrentPhotoPath);
-//
-////            if(imgFile.exists()){
-////                System.out.println("file exists");
-////            }
-//            System.out.println("before decode");
-//            //imageFilePath image path which you pass with intent
-//            Bitmap bmp = BitmapFactory.decodeFile();
-
-            // Display it
-
         }
 
     }
 
-    public String getOriginalImagePath() {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = this.managedQuery(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, null);
-        int column_index_data = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToLast();
-
-        return cursor.getString(column_index_data);
+    /**
+     * Take picture again
+     *
+     * @param view
+     */
+    public void retakePicture(View view)
+    {
+        this.dispatchTakePictureIntent();
     }
     /**
-     * Get Current image to save to
+     * Set up bitmap
+     *
+     * @param path
+     * @param reqWidth
+     * @param reqHeight
      * @return
-     * @throws IOException
      */
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        System.out.println("create file");
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
-
-
-
-    public static Bitmap decodeSampledBitmapFromFile(String path, int reqWidth, int reqHeight)
+    public Bitmap decodeSampledBitmapFromFile(String path, int reqWidth, int reqHeight)
     { // BEST QUALITY MATCH
 
         //First decode with inJustDecodeBounds=true to check dimensions
