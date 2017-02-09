@@ -32,4 +32,15 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, GegonotaActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Open pictureActivity
+     *
+     * @param view
+     */
+    public void pictureActivity(View view)
+    {
+        Intent intent = new Intent(MainActivity.this, PictureActivity.class);
+        startActivity(intent);
+    }
 }

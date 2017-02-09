@@ -7,12 +7,25 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.tania_nikos.remotesensing.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +46,8 @@
         <activity android:name=".EditXorafiActivity" />
         <activity android:name=".GegonotaActivity" />
         <activity android:name=".EisagwgiGegonosActivity" />
-        <activity android:name=".EditGegonosActivity"></activity>
+        <activity android:name=".EditGegonosActivity" />
+        <activity android:name=".PictureActivity" android:screenOrientation="portrait" ></activity>
     </application>
 
 </manifest>
