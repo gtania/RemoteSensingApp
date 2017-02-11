@@ -1,53 +1,58 @@
-package com.example.tania_nikos.remotesensing;
+package com.example.tania_nikos.remotesensing.ActivitiesProbolis;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.ActivitiesSindesis.GegonosSindesiActivity;
+import com.example.tania_nikos.remotesensing.ActivitiesSindesis.XwrafiSindesiActivity;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
+import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.MainActivity;
+import com.example.tania_nikos.remotesensing.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
-public class XorafiaActivity extends AppCompatActivity {
+import cz.msebera.android.httpclient.NameValuePair;
+import cz.msebera.android.httpclient.extras.Base64;
+import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-    /**
-     * ListView
-     */
+public class XwrafiaProboliActivity extends AppCompatActivity {
+
     ListView listView ;
-
-    /**
-     * Fields Array
-     */
     JSONArray fields;
 
     /**
-     * Create View Load Initial Data
+     * Constructor
+     * Set fiels listview selection
      *
      * @param savedInstanceState
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_xorafia);
-        // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.list_xorafia);
+        setContentView(R.layout.activity_xwrafia_proboli);
 
+                // Get ListView object from xml
+                listView = (ListView) findViewById(R.id.list_xwrafia_proboli);
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         String deviceId = telephonyManager.getDeviceId();
 
@@ -72,7 +77,12 @@ public class XorafiaActivity extends AppCompatActivity {
                                 try {
                                     JSONObject field = finalFields.getJSONObject(i);
 
-                                    fields_list.add(field.getString("onoma_xorafiou"));
+                                    fields_list.add(
+                                            field.getString("onoma_xorafiou") + "\n" +
+                                            field.getString("perioxi_xorafiou") + "\n" +
+                                            field.getString("etos_kaliergias") + "\n" +
+                                            field.getString("onoma_kaliergiti") + "\n"
+                                    );
 
 
                                 } catch (JSONException e) {
@@ -86,7 +96,7 @@ public class XorafiaActivity extends AppCompatActivity {
                             // Second parameter - Layout for the row
                             // Third parameter - ID of the TextView to which the data is written
                             // Forth - the Array of data
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XorafiaActivity.this,
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XwrafiaProboliActivity.this,
                                     android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
 
                             // Assign adapter to ListView
@@ -123,55 +133,19 @@ public class XorafiaActivity extends AppCompatActivity {
                     // ListView Clicked item value
 
                     JSONObject field = fields.getJSONObject(position);
+                    Integer field_id = field.getInt("id");
+                    /**
+                     *  TODO: pass field gia provoli
+                     */
 
-                    Intent intent = new Intent(XorafiaActivity.this, EditXorafiActivity.class);
+                    Intent intent = new Intent(XwrafiaProboliActivity.this, XwrafiProboliActivity.class);
                     intent.putExtra("id", field.getInt("id"));
-                    intent.putExtra("onoma_xorafiou", field.getString("onoma_xorafiou"));
-                    intent.putExtra("perioxi_xorafiou", field.getString("perioxi_xorafiou"));
-                    intent.putExtra("etos_kaliergias", field.getString("etos_kaliergias"));
-                    intent.putExtra("onoma_kaliergiti", field.getString("onoma_kaliergiti"));
-
-                    System.out.println("just before change view");
                     startActivity(intent);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-
             }
-
         });
-
-    }
-
-    /**
-     * Open EisagwgiXorafiActivity
-     *
-     * @param view
-     */
-    public void eisagegiXorafiaActivity(View view)
-    {
-        Intent intent = new Intent(XorafiaActivity.this, EisagwgiXorafiActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Handle back button
-     *
-     * @param keyCode
-     * @param event
-     * @return
-     */
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent intent = new Intent(XorafiaActivity.this, MainActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 }

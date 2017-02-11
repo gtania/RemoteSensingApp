@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,9 +25,20 @@ import java.util.ArrayList;
 
 public class GegonotaActivity extends AppCompatActivity {
 
+    /**
+     * List View
+     */
     ListView listView ;
+
+    /**
+     * Events array
+     */
     JSONArray events;
 
+    /**
+     * Initialize view load data
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,5 +153,22 @@ public class GegonotaActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(GegonotaActivity.this, EisagwgiGegonosActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Handle Back Button
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent intent = new Intent(GegonotaActivity.this, MainActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

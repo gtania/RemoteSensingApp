@@ -27,7 +27,17 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 public class EditXorafiActivity extends AppCompatActivity {
 
+    /**
+     * Selected field id
+     */
     int field_id;
+
+    /**
+     * Initialize view
+     * Load data of the selected item
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +67,7 @@ public class EditXorafiActivity extends AppCompatActivity {
 
     /**
      * Update Xorafi
+     *
      * @param view
      */
     public void updateXorafi(View view)
@@ -119,6 +130,7 @@ public class EditXorafiActivity extends AppCompatActivity {
 
     /**
      * Delete Xorafi
+     *
      * @param view
      */
     public void deleteXorafi(View view)

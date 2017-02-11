@@ -7,7 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -23,7 +26,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity android:name=".MainActivity">
@@ -47,7 +50,19 @@
         <activity android:name=".GegonotaActivity" />
         <activity android:name=".EisagwgiGegonosActivity" />
         <activity android:name=".EditGegonosActivity" />
-        <activity android:name=".PictureActivity" android:screenOrientation="portrait" ></activity>
+        <activity
+            android:name=".PictureActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ActivitiesSindesis.EidosSindesisActivity" />
+        <activity android:name=".ActivitiesSindesis.XwrafiSindesiActivity" />
+        <activity android:name=".ActivitiesSindesis.GegonosSindesiActivity" />
+        <activity android:name=".ActivitiesProbolis.EidosProbolisActivity" />
+        <activity android:name=".ActivitiesProbolis.XwrafiaProboliActivity" />
+        <activity android:name=".ActivitiesProbolis.GegonotaProboliActivity" />
+        <activity android:name=".ActivitiesProbolis.XwrafiProboliActivity" />
+        <activity android:name=".ActivitiesProbolis.XwrafiProboliSliderActivity" />
+        <activity android:name=".ActivitiesProbolis.GegonosProvoliActivity" />
+        <activity android:name=".ActivitiesProbolis.GegonosProvoliSliderActivity"></activity>
     </application>
 
 </manifest>

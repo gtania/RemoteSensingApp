@@ -26,8 +26,17 @@ import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
 public class EditGegonosActivity extends AppCompatActivity {
 
+    /**
+     * Event id of the selected
+     */
     int event_id;
 
+    /**
+     * Initialize view
+     * Load data of selected item
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

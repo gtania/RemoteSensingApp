@@ -15,14 +15,32 @@ import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 
 public class HttpGetTask implements HttpObject {
 
+    /**
+     * Url to call
+     */
     protected String url;
+
+    /**
+     * AsyncResponse Callback
+     */
     protected AsyncResponse asycResponse;
 
+    /**
+     * Constructor
+     *
+     * @param url
+     * @param asycResponse
+     */
     public HttpGetTask(String url, AsyncResponse asycResponse) {
         this.url = url;
         this.asycResponse = asycResponse;
     }
 
+    /**
+     * Execute Http task
+     *
+     * @return Response
+     */
     @Override
     public Response execute() {
 

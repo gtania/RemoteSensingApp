@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -16,16 +17,31 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.tania_nikos.remotesensing.ActivitiesSindesis.EidosSindesisActivity;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PictureActivity extends AppCompatActivity {
 
+    /**
+     * Camera code constant
+     */
     static final int REQUEST_IMAGE_CAPTURE = 1777;
+
+    /**
+     * Local path for image storage
+     */
     protected String mCurrentPhotoPath;
 
+    /**
+     * Initialize view open image capture
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +132,8 @@ public class PictureActivity extends AppCompatActivity {
                         break;
                 }
 
-                imageView.setImageBitmap(Bitmap.createBitmap(
+                // Rotate bitmap
+                Bitmap rotatedBitmap = Bitmap.createBitmap(
                         bitmap,
                         0,
                         0,
@@ -124,9 +141,33 @@ public class PictureActivity extends AppCompatActivity {
                         bitmap.getHeight(),
                         matrix,
                         true
-                ));
+                );
+
+                imageView.setImageBitmap(rotatedBitmap);
 
                 System.out.println("after show");
+
+                /**
+                 * Save The Rotated Bitmap
+                 */
+                FileOutputStream out = null;
+                try {
+                    out = new FileOutputStream(mCurrentPhotoPath);
+                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+                    // PNG is a lossless format, the compression factor (100) is ignored
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                System.out.println("after Rotated Save");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -144,6 +185,18 @@ public class PictureActivity extends AppCompatActivity {
     {
         this.dispatchTakePictureIntent();
     }
+
+    /**
+     * Connect picture
+     * @param view
+     */
+    public void connectPicture(View view)
+    {
+        Intent intent = new Intent(PictureActivity.this, EidosSindesisActivity.class);
+        intent.putExtra("photo_path", mCurrentPhotoPath);
+        startActivity(intent);
+    }
+
     /**
      * Set up bitmap
      *

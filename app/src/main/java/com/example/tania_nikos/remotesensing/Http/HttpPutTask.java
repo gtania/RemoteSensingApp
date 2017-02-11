@@ -24,16 +24,39 @@ import static cz.msebera.android.httpclient.HttpHeaders.USER_AGENT;
 
 public class HttpPutTask implements HttpObject {
 
+    /**
+     * Url to call
+     */
     protected String url;
+
+    /**
+     * Data to send
+     */
     protected List<NameValuePair> data;
+
+    /**
+     * AsyncResponse Callback
+     */
     protected AsyncResponse asycResponse;
 
+    /**
+     * Constructor
+     *
+     * @param url
+     * @param data
+     * @param asycResponse
+     */
     public HttpPutTask(String url, List<NameValuePair> data, AsyncResponse asycResponse) {
         this.url = url;
         this.data = data;
         this.asycResponse = asycResponse;
     }
 
+    /**
+     * Execute Http task
+     *
+     * @return Response
+     */
     @Override
     public Response execute() {
         try {

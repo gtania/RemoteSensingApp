@@ -32,7 +32,7 @@ public class EisagwgiGegonosActivity extends AppCompatActivity {
     }
 
     /**
-     * Save Gegonos
+     * Save Gegonos to the back end
      *
      * @param view
      */
