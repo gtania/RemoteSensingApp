@@ -2,7 +2,7 @@ package com.example.tania_nikos.remotesensing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
@@ -12,6 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
@@ -23,7 +25,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class GegonotaActivity extends AppCompatActivity {
+public class GegonotaActivity extends ActionBarActivity {
 
     /**
      * List View
@@ -43,12 +45,12 @@ public class GegonotaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gegonota);
+        InternetHandler.checkInternet(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_gegonota);
 
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+        String deviceId = Device.getId(this);
 
         HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/events", new AsyncResponse() {
             public void processFinish(Response response) {
@@ -129,6 +131,7 @@ public class GegonotaActivity extends AppCompatActivity {
                     intent.putExtra("perioxi_xorafiou", event.getString("perioxi_xorafiou"));
                     intent.putExtra("etos_kaliergias", event.getString("etos_kaliergias"));
                     intent.putExtra("onoma_kaliergiti", event.getString("onoma_kaliergiti"));
+                    intent.putExtra("eidos", event.getString("eidos"));
 
                     System.out.println("just before change view");
                     startActivity(intent);

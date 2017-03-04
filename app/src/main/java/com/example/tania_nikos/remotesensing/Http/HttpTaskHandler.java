@@ -14,7 +14,7 @@ public class HttpTaskHandler extends AsyncTask< HttpObject, Integer, Integer>
     /**
      * Base Url for Http calls
      */
-    public static final String baseUrl = "http://192.168.1.9:8000/api/";
+    public static final String baseUrl = "http://146.185.158.243/api/";
 
     /**
      * Hadle Http tasks in backgroud
@@ -26,6 +26,7 @@ public class HttpTaskHandler extends AsyncTask< HttpObject, Integer, Integer>
     protected Integer doInBackground(HttpObject... httpObjects) {
         for (HttpObject httpObject:httpObjects) {
             try {
+                System.out.println("in task handler");
                 httpObject.execute();
             } catch (IOException e) {
                 e.printStackTrace();

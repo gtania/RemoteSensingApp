@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.example.tania_nikos.remotesensing.ActivitiesSindesis.GegonosSindesiActivity;
 import com.example.tania_nikos.remotesensing.ActivitiesSindesis.XwrafiSindesiActivity;
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
@@ -35,7 +37,7 @@ import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.extras.Base64;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class XwrafiaProboliActivity extends AppCompatActivity {
+public class XwrafiaProboliActivity extends ActionBarActivity {
 
     ListView listView ;
     JSONArray fields;
@@ -50,11 +52,11 @@ public class XwrafiaProboliActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xwrafia_proboli);
+        InternetHandler.checkInternet(this);
 
                 // Get ListView object from xml
                 listView = (ListView) findViewById(R.id.list_xwrafia_proboli);
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+        String deviceId = Device.getId(this);
 
         HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/fields", new AsyncResponse() {
             public void processFinish(Response response) {
@@ -81,7 +83,8 @@ public class XwrafiaProboliActivity extends AppCompatActivity {
                                             field.getString("onoma_xorafiou") + "\n" +
                                             field.getString("perioxi_xorafiou") + "\n" +
                                             field.getString("etos_kaliergias") + "\n" +
-                                            field.getString("onoma_kaliergiti") + "\n"
+                                            field.getString("onoma_kaliergiti") + "\n" +
+                                            field.getString("eidos") + "\n"
                                     );
 
 

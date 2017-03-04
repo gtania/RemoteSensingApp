@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,6 +16,9 @@ import android.widget.Toast;
 
 import com.example.tania_nikos.remotesensing.EditXorafiActivity;
 import com.example.tania_nikos.remotesensing.EisagwgiXorafiActivity;
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
+import com.example.tania_nikos.remotesensing.Helpers.Spiner;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
@@ -36,7 +40,7 @@ import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.extras.Base64;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class XwrafiSindesiActivity extends AppCompatActivity {
+public class XwrafiSindesiActivity extends ActionBarActivity {
 
     /**
      * ListView
@@ -58,12 +62,12 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xwrafi_sindesi);
+        InternetHandler.checkInternet(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_xorafia_sindesi);
 
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+        String deviceId = Device.getId(this);
 
         HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/fields", new AsyncResponse() {
             public void processFinish(Response response) {
@@ -76,7 +80,7 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
                 }
 
 
-                System.out.println("In Get FIELDS " + fields.toString());
+                Log.d("Lod", "In Get FIELDS " + fields.toString());
                 if (response.status_code == 200) {
                     final JSONArray finalFields = fields;
                     runOnUiThread(new Runnable() {
@@ -135,6 +139,8 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
+                Spiner.show(XwrafiSindesiActivity.this);
+
                 // ListView Clicked item index
                 int itemPosition     = position;
 
@@ -144,8 +150,7 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
                     JSONObject field = fields.getJSONObject(position);
                     Integer field_id = field.getInt("id");
 
-                    TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                    String deviceId = telephonyManager.getDeviceId();
+                    String deviceId = Device.getId(XwrafiSindesiActivity.this);
 
                     // Image
                     Bitmap bm = BitmapFactory.decodeFile(getIntent().getStringExtra("photo_path"));
@@ -158,6 +163,7 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
                     // Set up data for post
                     List<NameValuePair> data = new ArrayList<NameValuePair>();
                     data.add(new BasicNameValuePair("base64_image", base64_image));
+                    data.add(new BasicNameValuePair("filepath", getIntent().getStringExtra("photo_path")));
 
 
                     HttpPostTask post = new HttpPostTask( HttpTaskHandler.baseUrl + deviceId + "/fields/"+ field_id + "/image", data, new AsyncResponse() {
@@ -168,10 +174,10 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
                                 jObject = new JSONObject(response.data);
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                System.out.println("Resposeeeeee : " + response.data);
 
                             }
-                            System.out.println("In call TRERERERERRE" + jObject.toString());
+
+                            Log.d("Log","In call TRERERERERRE" + response.status_code);
 
                             if (response.status_code == 200) {
                                 runOnUiThread(new Runnable() {
@@ -198,6 +204,8 @@ public class XwrafiSindesiActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            Spiner.dismiss();
+
                         }
                     });
 

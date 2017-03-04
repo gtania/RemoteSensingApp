@@ -1,14 +1,22 @@
 package com.example.tania_nikos.remotesensing.ActivitiesProbolis;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 import com.example.tania_nikos.remotesensing.Helpers.OnSwipeTouchListener;
+import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
+import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
+import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.MainActivity;
 import com.example.tania_nikos.remotesensing.R;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -21,7 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GegonosProvoliSliderActivity extends AppCompatActivity {
+public class GegonosProvoliSliderActivity extends Activity {
 
     /**
      * Data variables
@@ -41,6 +49,10 @@ public class GegonosProvoliSliderActivity extends AppCompatActivity {
     protected ImageLoader imageLoader;
     protected DisplayImageOptions options;
 
+    protected JSONArray commentsArray;
+    protected TextView commentTextView;
+    protected String commentText;
+
     /**
      * Constructor
      * Show Big Event Image
@@ -52,6 +64,7 @@ public class GegonosProvoliSliderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gegonos_provoli_slider);
+        InternetHandler.checkInternet(this);
 
         Intent intent = getIntent();
         String jsonArray = intent.getStringExtra("eventImages");
@@ -129,10 +142,51 @@ public class GegonosProvoliSliderActivity extends AppCompatActivity {
 
             imageLoader.displayImage(HttpTaskHandler.baseUrl + "images/events/"+ fieldImage.getInt("id"), imageView, options);
             textView.setText(fieldImage.getString("created_at"));
+            //latest_comment_gegonos
+            this.setComment(fieldImage.getInt("id"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
 
+    }
+    public void home(View view)
+    {
+        Intent intent = new Intent(GegonosProvoliSliderActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+
+    public void setComment(int id)
+    {
+        HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + "images/events/"+ id +"/getcomments", new AsyncResponse() {
+            public void processFinish(Response response) {
+
+                try {
+                    //parse response
+                    commentsArray = new JSONArray(response.data);
+                    commentTextView = (TextView) findViewById(R.id.latest_comment_gegonos);
+                    if(commentsArray.length()>0) {
+                        JSONObject comment = commentsArray.getJSONObject(commentsArray.length() - 1);
+                        commentText = comment.getString("text");
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                commentTextView.setText(commentText);
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                commentTextView.setText("");
+                            }
+                        });
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        new HttpTaskHandler().execute(get);
     }
 }

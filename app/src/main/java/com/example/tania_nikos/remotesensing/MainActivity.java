@@ -2,21 +2,23 @@ package com.example.tania_nikos.remotesensing;
 
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.tania_nikos.remotesensing.ActivitiesProbolis.EidosProbolisActivity;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.isInternetOn();
+        InternetHandler.checkInternet(this);
+
     }
 
     /**

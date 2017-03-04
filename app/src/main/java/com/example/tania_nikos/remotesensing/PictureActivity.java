@@ -11,13 +11,15 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.tania_nikos.remotesensing.ActivitiesSindesis.EidosSindesisActivity;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,7 +27,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PictureActivity extends AppCompatActivity {
+public class PictureActivity extends ActionBarActivity {
 
     /**
      * Camera code constant
@@ -37,6 +39,8 @@ public class PictureActivity extends AppCompatActivity {
      */
     protected String mCurrentPhotoPath;
 
+    Button retake;
+    Button connect;
     /**
      * Initialize view open image capture
      *
@@ -46,9 +50,13 @@ public class PictureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
-        System.out.println("in view");
+        InternetHandler.checkInternet(this);
 
-        this.dispatchTakePictureIntent();
+        connect = (Button) findViewById(R.id.button_connect);
+        connect.setEnabled(false);
+
+        retake = (Button) findViewById(R.id.button_retake);
+
     }
 
     /**
@@ -74,14 +82,14 @@ public class PictureActivity extends AppCompatActivity {
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+                Environment.DIRECTORY_PICTURES), "FarmPhotoTool");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
+                Log.d("FarmPhotoTool", "failed to create directory");
                 return null;
             }
         }
@@ -104,7 +112,6 @@ public class PictureActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("in result");
 
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -145,7 +152,8 @@ public class PictureActivity extends AppCompatActivity {
 
                 imageView.setImageBitmap(rotatedBitmap);
 
-                System.out.println("after show");
+//                Log.d("MyApp", "after show with store Dir : "+Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES) + " PATH : " + mCurrentPhotoPath);
 
                 /**
                  * Save The Rotated Bitmap
@@ -167,7 +175,6 @@ public class PictureActivity extends AppCompatActivity {
                     }
                 }
 
-                System.out.println("after Rotated Save");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -184,6 +191,8 @@ public class PictureActivity extends AppCompatActivity {
     public void retakePicture(View view)
     {
         this.dispatchTakePictureIntent();
+        retake.setText("Επανάληψη");
+        connect.setEnabled(true);
     }
 
     /**

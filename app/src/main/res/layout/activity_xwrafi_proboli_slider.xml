@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/lib/com.example.tania_nikos.remotesensing"
+    xmlns:app2="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_xwrafi_proboli_slider"
     android:layout_width="match_parent"
@@ -9,30 +10,52 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.tania_nikos.remotesensing.ActivitiesProbolis.XwrafiProboliSliderActivity">
+    tools:context="com.example.tania_nikos.remotesensing.ActivitiesProbolis.XwrafiProboliSliderActivity"
+    android:weightSum="1">
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/slider_image_date"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:layout_toLeftOf="@+id/button19"
+        android:layout_toStartOf="@+id/button19" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_menu_report_image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/image_view_slider"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/slider_image_date" />
+        android:layout_below="@+id/latest_comment" />
 
-    <TextView
-        android:text="TextView"
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/slider_image_date"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:textAlignment="center"
-        android:textSize="18sp" />
+        android:id="@+id/button19"
+        android:textAllCaps="false"
+        android:text="Αρχική"
+        android:onClick="home"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:layout_below="@+id/slider_image_date"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/latest_comment"
+        android:layout_toLeftOf="@+id/button19"
+        android:layout_toStartOf="@+id/button19" />
+
+
 </RelativeLayout>

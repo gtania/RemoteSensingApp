@@ -84,7 +84,12 @@ public class HttpPostTask implements HttpObject {
             Response response = new Response();
             response.status_code = httpResponse.getStatusLine().getStatusCode();
             response.error = httpResponse.getStatusLine().getReasonPhrase();
-            response.data = result.toString();
+            if (result != null){
+                response.data = result.toString();
+            } else {
+                response.data = null;
+            }
+
 
             this.asycResponse.processFinish(response);
             return response;

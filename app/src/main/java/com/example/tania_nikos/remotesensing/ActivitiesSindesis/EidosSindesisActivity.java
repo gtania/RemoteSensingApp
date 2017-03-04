@@ -1,19 +1,21 @@
 package com.example.tania_nikos.remotesensing.ActivitiesSindesis;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 import com.example.tania_nikos.remotesensing.PictureActivity;
 import com.example.tania_nikos.remotesensing.R;
 
-public class EidosSindesisActivity extends AppCompatActivity {
+public class EidosSindesisActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eidos_sindesis);
+        InternetHandler.checkInternet(this);
 
         String onoma_gegonotos = getIntent().getStringExtra("onoma_gegonotos");
     }

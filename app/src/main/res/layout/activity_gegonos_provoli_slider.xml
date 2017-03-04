@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/lib/com.example.tania_nikos.remotesensing"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_gegonos_provoli_slider"
     android:layout_width="match_parent"
@@ -19,20 +19,41 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/slider_image_gegonos_date"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:textAlignment="center"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_toLeftOf="@+id/arxiki_gegonos"
+        android:layout_toStartOf="@+id/arxiki_gegonos" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_menu_report_image"
-        android:layout_below="@+id/slider_image_gegonos_date"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/image_view_gegonos_slider"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/latest_comment_gegonos" />
+
+    <Button
+        android:text="Αρχική"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/arxiki_gegonos"
+        android:onClick="home"
+        android:textAllCaps="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:layout_below="@+id/slider_image_gegonos_date"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/latest_comment_gegonos"
+        android:layout_toLeftOf="@+id/arxiki_gegonos"
+        android:layout_toStartOf="@+id/arxiki_gegonos" />
 </RelativeLayout>

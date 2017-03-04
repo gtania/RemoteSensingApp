@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
@@ -24,7 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class XorafiaActivity extends AppCompatActivity {
+public class XorafiaActivity extends ActionBarActivity {
 
     /**
      * ListView
@@ -44,12 +46,18 @@ public class XorafiaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        InternetHandler.checkInternet(this);
+        System.out.println("before Device ID");
+        String deviceId = Device.getId(this);
+
+        System.out.println("in view Xwrafia");
         setContentView(R.layout.activity_xorafia);
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_xorafia);
 
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+
+
+        System.out.println("before HTTP CALL");
 
         HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/fields", new AsyncResponse() {
             public void processFinish(Response response) {
@@ -130,6 +138,7 @@ public class XorafiaActivity extends AppCompatActivity {
                     intent.putExtra("perioxi_xorafiou", field.getString("perioxi_xorafiou"));
                     intent.putExtra("etos_kaliergias", field.getString("etos_kaliergias"));
                     intent.putExtra("onoma_kaliergiti", field.getString("onoma_kaliergiti"));
+                    intent.putExtra("eidos", field.getString("eidos"));
 
                     System.out.println("just before change view");
                     startActivity(intent);

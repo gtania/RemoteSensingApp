@@ -11,12 +11,16 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="FarmPhotoTool"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
@@ -62,7 +66,11 @@
         <activity android:name=".ActivitiesProbolis.XwrafiProboliActivity" />
         <activity android:name=".ActivitiesProbolis.XwrafiProboliSliderActivity" />
         <activity android:name=".ActivitiesProbolis.GegonosProvoliActivity" />
-        <activity android:name=".ActivitiesProbolis.GegonosProvoliSliderActivity"></activity>
+        <activity android:name=".ActivitiesProbolis.GegonosProvoliSliderActivity" />
+        <activity android:name=".ActivitiesProbolis.TabsXwrafiActivity" />
+        <activity android:name=".ActivitiesProbolis.CommentsActivity" />
+        <activity android:name=".ActivitiesProbolis.TabsGegonosActivity" />
+        <activity android:name=".ActivitiesProbolis.CommentsGegonosActivity"></activity>
     </application>
 
 </manifest>

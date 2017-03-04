@@ -1,15 +1,19 @@
 package com.example.tania_nikos.remotesensing;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
+import com.example.tania_nikos.remotesensing.Helpers.Spiner;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
@@ -28,8 +32,7 @@ import java.util.List;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class EisagwgiXorafiActivity extends AppCompatActivity {
-
+public class EisagwgiXorafiActivity extends ActionBarActivity {
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -40,6 +43,7 @@ public class EisagwgiXorafiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eisagwgi_xorafia);
+        InternetHandler.checkInternet(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
@@ -52,20 +56,24 @@ public class EisagwgiXorafiActivity extends AppCompatActivity {
      * @param view
      */
     public void saveXorafi(View view) {
-               TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+
+
+        Spiner.show(this);
+
+        String deviceId = Device.getId(this);
 
         EditText onoma_xorafiou   = (EditText)findViewById(R.id.onoma_xorafiou);
         EditText perioxi_xorafiou   = (EditText)findViewById(R.id.perioxi_xorafiou);
         EditText etos_kaliergias   = (EditText)findViewById(R.id.etos_kaliergias);
         EditText onoma_kaliergiti   = (EditText)findViewById(R.id.onoma_kaliergiti);
-
+        EditText eidos_kaliergeias  = (EditText)findViewById(R.id.eidos_kaliergeias);
         // Set up data for post
         List<NameValuePair> data = new ArrayList<NameValuePair>();
         data.add(new BasicNameValuePair("onoma_xorafiou", onoma_xorafiou.getText().toString()));
         data.add(new BasicNameValuePair("perioxi_xorafiou", perioxi_xorafiou.getText().toString() ));
         data.add(new BasicNameValuePair("etos_kaliergias", etos_kaliergias.getText().toString()));
         data.add(new BasicNameValuePair("onoma_kaliergiti", onoma_kaliergiti.getText().toString()));
+        data.add(new BasicNameValuePair("eidos", eidos_kaliergeias.getText().toString()));
 
         HttpPostTask post = new HttpPostTask( HttpTaskHandler.baseUrl + deviceId + "/fields", data, new AsyncResponse() {
             public void processFinish(Response response) {
@@ -103,6 +111,7 @@ public class EisagwgiXorafiActivity extends AppCompatActivity {
                         }
                     });
                 }
+                Spiner.dismiss();
             }
         });
 

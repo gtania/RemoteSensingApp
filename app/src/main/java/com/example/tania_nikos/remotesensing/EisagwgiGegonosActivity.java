@@ -2,13 +2,16 @@ package com.example.tania_nikos.remotesensing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
+import com.example.tania_nikos.remotesensing.Helpers.Spiner;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
@@ -23,12 +26,13 @@ import java.util.List;
 import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class EisagwgiGegonosActivity extends AppCompatActivity {
+public class EisagwgiGegonosActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eisagwgi_gegonos);
+        InternetHandler.checkInternet(this);
     }
 
     /**
@@ -38,8 +42,8 @@ public class EisagwgiGegonosActivity extends AppCompatActivity {
      */
     public void saveGegonos(View view)
     {
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+        Spiner.show(this);
+        String deviceId = Device.getId(this);
 
         EditText onoma_gegonotos   = (EditText)findViewById(R.id.onoma_gegonotos);
         EditText perigrafi_gegonotos   = (EditText)findViewById(R.id.perigrafi_gegonos_edit);
@@ -47,6 +51,8 @@ public class EisagwgiGegonosActivity extends AppCompatActivity {
         EditText perioxi_xorafiou   = (EditText)findViewById(R.id.perioxi_xorafiou_gegonos);
         EditText etos_kaliergias   = (EditText)findViewById(R.id.etos_kaliergias_gegonos);
         EditText onoma_kaliergiti   = (EditText)findViewById(R.id.onoma_kaliergiti_gegonos);
+        EditText eidos_kaliergeias   = (EditText)findViewById(R.id.eidos_kaliergeias_gegonos);
+
 
         // Set up data for post
         List<NameValuePair> data = new ArrayList<NameValuePair>();
@@ -56,6 +62,7 @@ public class EisagwgiGegonosActivity extends AppCompatActivity {
         data.add(new BasicNameValuePair("perioxi_xorafiou", perioxi_xorafiou.getText().toString() ));
         data.add(new BasicNameValuePair("etos_kaliergias", etos_kaliergias.getText().toString()));
         data.add(new BasicNameValuePair("onoma_kaliergiti", onoma_kaliergiti.getText().toString()));
+        data.add(new BasicNameValuePair("eidos", eidos_kaliergeias.getText().toString()));
 
         HttpPostTask post = new HttpPostTask( HttpTaskHandler.baseUrl + deviceId + "/events", data, new AsyncResponse() {
             public void processFinish(Response response) {
@@ -92,6 +99,7 @@ public class EisagwgiGegonosActivity extends AppCompatActivity {
                         }
                     });
                 }
+                Spiner.dismiss();
             }
         });
 

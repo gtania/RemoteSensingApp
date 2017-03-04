@@ -103,4 +103,18 @@
         android:id="@+id/button8"
         android:textAllCaps="false"
         android:onClick="saveGegonos" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="Είδος Καλλιέργιας"
+        android:ems="10"
+        android:layout_below="@+id/onoma_kaliergiti_gegonos"
+        android:layout_marginTop="13dp"
+        android:id="@+id/eidos_kaliergeias_gegonos"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

@@ -44,6 +44,7 @@ public class HttpDeleteTask implements HttpObject {
      */
     @Override
     public Response execute() {
+        System.out.println("in DELETE task handler");
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpDelete delete = new HttpDelete(this.url);
@@ -65,6 +66,7 @@ public class HttpDeleteTask implements HttpObject {
             response.status_code = httpResponse.getStatusLine().getStatusCode();
             response.error = httpResponse.getStatusLine().getReasonPhrase();
             response.data = result.toString();
+            System.out.println("in DELETE task handler before procc fin");
 
             this.asycResponse.processFinish(response);
             return response;

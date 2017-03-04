@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -13,6 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.tania_nikos.remotesensing.Helpers.Device;
+import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
+import com.example.tania_nikos.remotesensing.Helpers.Spiner;
 import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
@@ -33,7 +36,7 @@ import cz.msebera.android.httpclient.NameValuePair;
 import cz.msebera.android.httpclient.extras.Base64;
 import cz.msebera.android.httpclient.message.BasicNameValuePair;
 
-public class GegonosSindesiActivity extends AppCompatActivity {
+public class GegonosSindesiActivity extends ActionBarActivity {
 
     ListView listView ;
 
@@ -52,12 +55,12 @@ public class GegonosSindesiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gegonos_sindesi);
+        InternetHandler.checkInternet(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_gegonota_sindesi);
 
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = telephonyManager.getDeviceId();
+        String deviceId = Device.getId(this);
 
         HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/events", new AsyncResponse() {
             public void processFinish(Response response) {
@@ -129,6 +132,8 @@ public class GegonosSindesiActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                Spiner.show(GegonosSindesiActivity.this);
+
 
                 // ListView Clicked item index
                 int itemPosition     = position;
@@ -139,8 +144,7 @@ public class GegonosSindesiActivity extends AppCompatActivity {
                     JSONObject event = events.getJSONObject(position);
                     Integer event_id = event.getInt("id");
 
-                    TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                    String deviceId = telephonyManager.getDeviceId();
+                    String deviceId = Device.getId(GegonosSindesiActivity.this);
 
                     // Image
                     Bitmap bm = BitmapFactory.decodeFile(getIntent().getStringExtra("photo_path"));
@@ -153,7 +157,7 @@ public class GegonosSindesiActivity extends AppCompatActivity {
                     // Set up data for post
                     List<NameValuePair> data = new ArrayList<NameValuePair>();
                     data.add(new BasicNameValuePair("base64_image", base64_image));
-
+                    data.add(new BasicNameValuePair("filepath", getIntent().getStringExtra("photo_path")));
 
                     HttpPostTask post = new HttpPostTask( HttpTaskHandler.baseUrl + deviceId + "/events/"+ event_id + "/image", data, new AsyncResponse() {
                         public void processFinish(Response response) {
@@ -163,10 +167,10 @@ public class GegonosSindesiActivity extends AppCompatActivity {
                                 jObject = new JSONObject(response.data);
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                System.out.println("Resposeeeeee : " + response.data);
+                             //   System.out.println("Resposeeeeee : " + response.data);
 
                             }
-                            System.out.println("In call TRERERERERRE" + jObject.toString());
+                          //  System.out.println("In call TRERERERERRE" + jObject.toString());
 
                             if (response.status_code == 200) {
                                 runOnUiThread(new Runnable() {
@@ -193,6 +197,8 @@ public class GegonosSindesiActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            Spiner.dismiss();
+
                         }
                     });
 

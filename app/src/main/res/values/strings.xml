@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">RemoteSensing</string>
+    <string name="title_activity_tabs_xwrafi">TabsXwrafiActivity</string>
 </resources>
 
