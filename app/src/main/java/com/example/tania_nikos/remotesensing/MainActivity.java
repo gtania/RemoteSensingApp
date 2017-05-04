@@ -1,14 +1,18 @@
 package com.example.tania_nikos.remotesensing;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.tania_nikos.remotesensing.ActivitiesProbolis.EidosProbolisActivity;
+import com.example.tania_nikos.remotesensing.Database.DBHandler;
 import com.example.tania_nikos.remotesensing.Helpers.InternetHandler;
 
 public class MainActivity extends ActionBarActivity {
@@ -17,7 +21,16 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        InternetHandler.checkInternet(this);
+
+//        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+//        Cursor c = dbHandler.getTables();
+//        if (c.moveToFirst()) {
+//            while ( !c.isAfterLast() ) {
+//                Toast.makeText(MainActivity.this, "Table Name=> "+c.getString(0), Toast.LENGTH_LONG).show();
+//                Log.i("SQL LOG ",  "Table Name=> "+c.getString(0));
+//                c.moveToNext();
+//            }
+//        }
 
     }
 
@@ -63,37 +76,6 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-    /**
-     * Check if device is connected to the internet
-     *
-     * @return
-     */
-    public final boolean isInternetOn() {
-
-        // get Connectivity Manager object to check connection
-        ConnectivityManager connec =
-                (ConnectivityManager)getSystemService(getBaseContext().CONNECTIVITY_SERVICE);
-
-        // Check for network connections
-        if ( connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
-                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
-
-            // if connected with internet
-
-            //Toast.makeText(this, " Connected ", Toast.LENGTH_LONG).show();
-            return true;
-
-        } else if (
-                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
-                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED  ) {
-
-            Toast.makeText(this, "Δεν βρέθηκε σύνδεση στο internet", Toast.LENGTH_LONG).show();
-            return false;
-        }
-        return false;
-    }
 
     /**
      * Close application on back button

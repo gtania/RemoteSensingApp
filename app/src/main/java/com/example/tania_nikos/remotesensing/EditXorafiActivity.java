@@ -1,6 +1,7 @@
 package com.example.tania_nikos.remotesensing;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpPutTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.Models.Field;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +53,6 @@ public class EditXorafiActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_xorafi);
-        InternetHandler.checkInternet(this);
 
         System.out.println("in new view");
 
@@ -94,52 +95,32 @@ public class EditXorafiActivity extends ActionBarActivity {
         EditText eidos_kaliergeias   = (EditText)findViewById(R.id.eidos_kaliergeias_edit);
 
         // Set up data for post
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("onoma_xorafiou", onoma_xorafiou.getText().toString()));
-        data.add(new BasicNameValuePair("perioxi_xorafiou", perioxi_xorafiou.getText().toString() ));
-        data.add(new BasicNameValuePair("etos_kaliergias", etos_kaliergias.getText().toString()));
-        data.add(new BasicNameValuePair("onoma_kaliergiti", onoma_kaliergiti.getText().toString()));
-        data.add(new BasicNameValuePair("eidos", eidos_kaliergeias.getText().toString()));
+        ContentValues data = new ContentValues();
+        data.put("device_id", deviceId);
+        data.put("onoma_xorafiou", onoma_xorafiou.getText().toString());
+        data.put("perioxi_xorafiou", perioxi_xorafiou.getText().toString());
+        data.put("etos_kaliergias", etos_kaliergias.getText().toString());
+        data.put("onoma_kaliergiti", onoma_kaliergiti.getText().toString());
+        data.put("eidos", eidos_kaliergeias.getText().toString());
 
-        HttpPutTask put = new HttpPutTask( HttpTaskHandler.baseUrl + deviceId + "/fields/" + this.field_id, data, new AsyncResponse() {
-            public void processFinish(Response response) {
+        Field field = new Field(this);
+        int rows_affected = field.updateField(this.field_id, data);
+        if (rows_affected > 0) {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Αποθήκευση επιτυχής",
+                    Toast.LENGTH_LONG
+            ).show();
 
-                JSONObject jObject = null;
-                try {
-                    jObject = new JSONObject(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("In call UPdateeee" + jObject.toString());
-
-                if (response.status_code == 200) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Αποθήκευση επιτυχής",
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
-                    });
-
-                    Intent intent = new Intent(EditXorafiActivity.this, XorafiaActivity.class);
-                    startActivity(intent);
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Αποθήκευση μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
-                Spiner.dismiss();
-            }
-        });
-        new HttpTaskHandler().execute(put);
+            Intent intent = new Intent(EditXorafiActivity.this, XorafiaActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Αποθήκευση μη επιτυχής",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
     }
 
     /**

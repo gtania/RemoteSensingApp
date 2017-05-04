@@ -3,9 +3,11 @@ package com.example.tania_nikos.remotesensing;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,6 +21,7 @@ import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.Models.Field;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,9 +37,9 @@ public class XorafiaActivity extends ActionBarActivity {
     ListView listView ;
 
     /**
-     * Fields Array
+     *
      */
-    JSONArray fields;
+    Cursor fieldsCursor;
 
     /**
      * Create View Load Initial Data
@@ -46,7 +49,6 @@ public class XorafiaActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        InternetHandler.checkInternet(this);
         System.out.println("before Device ID");
         String deviceId = Device.getId(this);
 
@@ -59,100 +61,67 @@ public class XorafiaActivity extends ActionBarActivity {
 
         System.out.println("before HTTP CALL");
 
-        HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/fields", new AsyncResponse() {
-            public void processFinish(Response response) {
-                // an exei lathi ta emfanizoume
-                try {
-                    //parse response
-                    fields = new JSONArray(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        Field field = new Field(this);
+        final Cursor fieldsCursor = field.getFields();
+                Log.i("IS CURSOR EMPTY ?? => ",  fieldsCursor.getCount() + " => "+ (fieldsCursor == null ? " is null" : " not null"));
 
+        if (fieldsCursor != null) {
+            ArrayList<String> fields_list = new ArrayList<String>();
 
-                System.out.println("In Get FIELDS " + fields.toString());
-                if (response.status_code == 200) {
-                    final JSONArray finalFields = fields;
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ArrayList<String> fields_list = new ArrayList<String>();
-                            for (int i = 0; i < finalFields.length(); i++) {
-                                try {
-                                    JSONObject field = finalFields.getJSONObject(i);
-
-                                    fields_list.add(field.getString("onoma_xorafiou"));
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-
-                            // Define a new Adapter
-                            // First parameter - Context
-                            // Second parameter - Layout for the row
-                            // Third parameter - ID of the TextView to which the data is written
-                            // Forth - the Array of data
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XorafiaActivity.this,
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
-
-                            // Assign adapter to ListView
-                            listView.setAdapter(adapter);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run()
-                        {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Φόρτωση μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
-            }
-        });
-        new HttpTaskHandler().execute(get);
-
-        // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                // ListView Clicked item index
-                int itemPosition     = position;
-
-                try {
-                    // ListView Clicked item value
-
-                    JSONObject field = fields.getJSONObject(position);
-
-                    Intent intent = new Intent(XorafiaActivity.this, EditXorafiActivity.class);
-                    intent.putExtra("id", field.getInt("id"));
-                    intent.putExtra("onoma_xorafiou", field.getString("onoma_xorafiou"));
-                    intent.putExtra("perioxi_xorafiou", field.getString("perioxi_xorafiou"));
-                    intent.putExtra("etos_kaliergias", field.getString("etos_kaliergias"));
-                    intent.putExtra("onoma_kaliergiti", field.getString("onoma_kaliergiti"));
-                    intent.putExtra("eidos", field.getString("eidos"));
-
-                    System.out.println("just before change view");
-                    startActivity(intent);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-
-
+            while (fieldsCursor.moveToNext()) {
+                Log.i(" ITEMS LOOP ", "IN" + fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_xorafiou")));
+                fields_list.add(fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_xorafiou")));
             }
 
-        });
+
+
+            // Define a new Adapter
+            // First parameter - Context
+            // Second parameter - Layout for the row
+            // Third parameter - ID of the TextView to which the data is written
+            // Forth - the Array of data
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XorafiaActivity.this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
+
+            // Assign adapter to ListView
+            listView.setAdapter(adapter);
+
+            // ListView Item Click Listener
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        // ListView Clicked item index
+                        int itemPosition     = position;
+
+                        // ListView Clicked item value
+                        fieldsCursor.moveToPosition(position);
+                        //JSONObject field = fieldsCursor.getJSONObject(position);
+
+                        Intent intent = new Intent(XorafiaActivity.this, EditXorafiActivity.class);
+                        intent.putExtra("id", fieldsCursor.getInt(fieldsCursor.getColumnIndex(("id"))));
+                        intent.putExtra("onoma_xorafiou", fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_xorafiou")));
+                        intent.putExtra("perioxi_xorafiou", fieldsCursor.getString(fieldsCursor.getColumnIndex("perioxi_xorafiou")));
+                        intent.putExtra("etos_kaliergias", fieldsCursor.getString(fieldsCursor.getColumnIndex("etos_kaliergias")));
+                        intent.putExtra("onoma_kaliergiti", fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_kaliergiti")));
+                        intent.putExtra("eidos", fieldsCursor.getString(fieldsCursor.getColumnIndex("eidos")));
+
+                        System.out.println("just before change view");
+                        startActivity(intent);
+                }
+
+            });
+
+
+
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Φόρτωση μη επιτυχής",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
 
     }
 
