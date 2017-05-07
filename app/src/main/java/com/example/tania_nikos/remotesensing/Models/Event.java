@@ -41,4 +41,14 @@ public class Event extends Model{
 
         return this.handler.getReadableDatabase().update(DBHandler.TABLE_EVENTS, data, "id=" + id, null);
     }
+
+    public long addEventImage(ContentValues data)
+    {
+        String now = this.getDateNow();
+
+        data.put("created_at", now);
+        data.put("updated_at", now);
+
+        return this.handler.getWritableDatabase().insert(DBHandler.TABLE_EVENTS_IMAGES, null, data);
+    }
 }

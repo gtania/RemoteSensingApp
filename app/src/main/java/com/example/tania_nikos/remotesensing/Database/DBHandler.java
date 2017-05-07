@@ -15,7 +15,7 @@ import java.io.File;
 
 public class DBHandler extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "remotesensing.db";
 
     // TABLE NAMES
@@ -79,7 +79,7 @@ public class DBHandler extends SQLiteOpenHelper {
     // Event images TABLE
     // id
     public static final String EVENT_IMAGES_FIELD_ID = "event_id";
-    public static final String EVENT_IMAGES_FILENAME = "filename";
+    //public static final String EVENT_IMAGES_FILENAME = "filename";
     public static final String EVENT_IMAGES_FILEPATH = "filepath";
     // created at
     // updated at
@@ -149,8 +149,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String CREATE_EVENT_IMAGES  = "create table " + TABLE_EVENTS_IMAGES + "( "
             + KEY_ID                + " integer primary key autoincrement, "
             + EVENT_IMAGES_FIELD_ID + " integer not null,"
-            + EVENT_IMAGES_FILENAME + " text not null,"
-            + EVENT_IMAGES_FILEPATH + "text not null,"
+      //      + EVENT_IMAGES_FILENAME + " text not null,"
+            + EVENT_IMAGES_FILEPATH + " text not null,"
             + KEY_CREATED_AT + " datetime,"
             + KEY_UPDATED_AT + " datetime,"
             + "FOREIGN KEY ("+EVENT_IMAGES_FIELD_ID+") REFERENCES "+ TABLE_EVENTS+"("+KEY_ID+") ON DELETE CASCADE"
