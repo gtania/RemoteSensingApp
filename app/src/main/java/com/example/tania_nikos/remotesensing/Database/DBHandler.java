@@ -16,7 +16,7 @@ import java.io.File;
 public class DBHandler extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "remotesensing.db";
+    public static final String DATABASE_NAME = "remotesensing.db";
 
     // TABLE NAMES
     public static final String TABLE_FIELDS = "fields";
@@ -209,7 +209,7 @@ public class DBHandler extends SQLiteOpenHelper {
         // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (sInstance == null) {
-            sInstance = new DBHandler(context, null, null, DBHandler.DATABASE_VERSION);
+            sInstance = new DBHandler(context, DBHandler.DATABASE_NAME, null, DBHandler.DATABASE_VERSION);
         }
         return sInstance;
     }
