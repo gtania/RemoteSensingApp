@@ -2,9 +2,11 @@ package com.example.tania_nikos.remotesensing;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +20,7 @@ import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpGetTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.Models.Event;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,9 +36,9 @@ public class GegonotaActivity extends ActionBarActivity {
     ListView listView ;
 
     /**
-     * Events array
+     *
      */
-    JSONArray events;
+    Cursor eventsCursor;
 
     /**
      * Initialize view load data
@@ -45,106 +48,73 @@ public class GegonotaActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gegonota);
-        InternetHandler.checkInternet(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_gegonota);
 
         String deviceId = Device.getId(this);
 
-        HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/events", new AsyncResponse() {
-            public void processFinish(Response response) {
-                // an exei lathi ta emfanizoume
-                try {
-                    //parse response
-                    events = new JSONArray(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        Event event = new Event(this);
+        final Cursor eventsCursor = event.getEvents();
 
+        if (eventsCursor != null) {
+            ArrayList<String> events_list = new ArrayList<String>();
 
-                System.out.println("In Get GEGONOTA " + events.toString());
-                if (response.status_code == 200) {
-                    final JSONArray finalEvents = events;
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ArrayList<String> fields_list = new ArrayList<String>();
-                            for (int i = 0; i < finalEvents.length(); i++) {
-                                try {
-                                    JSONObject field = finalEvents.getJSONObject(i);
-
-                                    fields_list.add(field.getString("onoma_gegonotos"));
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-
-                            // Define a new Adapter
-                            // First parameter - Context
-                            // Second parameter - Layout for the row
-                            // Third parameter - ID of the TextView to which the data is written
-                            // Forth - the Array of data
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(GegonotaActivity.this,
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
-
-                            // Assign adapter to ListView
-                            listView.setAdapter(adapter);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run()
-                        {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Φόρτωση μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
+            while (eventsCursor.moveToNext()) {
+                events_list.add(eventsCursor.getString(eventsCursor.getColumnIndex("onoma_gegonotos")));
             }
-        });
-        new HttpTaskHandler().execute(get);
 
-        // ListView Item Click Listener
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            // Define a new Adapter
+            // First parameter - Context
+            // Second parameter - Layout for the row
+            // Third parameter - ID of the TextView to which the data is written
+            // Forth - the Array of data
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(GegonotaActivity.this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, events_list);
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            // Assign adapter to ListView
+            listView.setAdapter(adapter);
 
-                // ListView Clicked item index
-                int itemPosition = position;
 
-                try {
-                    JSONObject event = events.getJSONObject(position);
+            // ListView Item Click Listener
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+
+                    // ListView Clicked item index
+                    int itemPosition = position;
+
+                    eventsCursor.moveToPosition(position);
 
                     Intent intent = new Intent(GegonotaActivity.this, EditGegonosActivity.class);
-                    intent.putExtra("id", event.getInt("id"));
-                    intent.putExtra("onoma_gegonotos", event.getString("onoma_gegonotos"));
-                    intent.putExtra("perigrafi_gegonotos", event.getString("perigrafi_gegonotos"));
-                    intent.putExtra("onoma_xorafiou", event.getString("onoma_xorafiou"));
-                    intent.putExtra("perioxi_xorafiou", event.getString("perioxi_xorafiou"));
-                    intent.putExtra("etos_kaliergias", event.getString("etos_kaliergias"));
-                    intent.putExtra("onoma_kaliergiti", event.getString("onoma_kaliergiti"));
-                    intent.putExtra("eidos", event.getString("eidos"));
+                    intent.putExtra("id", eventsCursor.getInt(eventsCursor.getColumnIndex("id")));
+                    intent.putExtra("onoma_gegonotos", eventsCursor.getString(eventsCursor.getColumnIndex("onoma_gegonotos")));
+                    intent.putExtra("perigrafi_gegonotos", eventsCursor.getString(eventsCursor.getColumnIndex("perigrafi_gegonotos")));
+                    intent.putExtra("onoma_xorafiou", eventsCursor.getString(eventsCursor.getColumnIndex("onoma_xorafiou")));
+                    intent.putExtra("perioxi_xorafiou", eventsCursor.getString(eventsCursor.getColumnIndex("perioxi_xorafiou")));
+                    intent.putExtra("etos_kaliergias", eventsCursor.getString(eventsCursor.getColumnIndex("etos_kaliergias")));
+                    intent.putExtra("onoma_kaliergiti", eventsCursor.getString(eventsCursor.getColumnIndex("onoma_kaliergiti")));
+                    intent.putExtra("eidos", eventsCursor.getString(eventsCursor.getColumnIndex("eidos")));
 
                     System.out.println("just before change view");
                     startActivity(intent);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+            });
 
-
-            }
-
-        });
-
+        }  else {
+            runOnUiThread(new Runnable() {
+                public void run()
+                {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "Φόρτωση μη επιτυχής",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        }
     }
 
     /**

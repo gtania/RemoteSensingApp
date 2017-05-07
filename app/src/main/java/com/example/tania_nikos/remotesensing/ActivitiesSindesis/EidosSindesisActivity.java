@@ -15,8 +15,6 @@ public class EidosSindesisActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eidos_sindesis);
-        InternetHandler.checkInternet(this);
-
         String onoma_gegonotos = getIntent().getStringExtra("onoma_gegonotos");
     }
 

@@ -18,7 +18,7 @@ import cz.msebera.android.httpclient.NameValuePair;
  * Created by Tania-Nikos on 3/5/2017.
  */
 
-public class Field {
+public class Field extends Model {
 
     DBHandler handler;
 
@@ -37,14 +37,12 @@ public class Field {
 
         data.put("created_at", now);
         data.put("updated_at", now);
-        return this.handler.getWritableDatabase().insert("fields", null, data);
+        return this.handler.getWritableDatabase().insert(DBHandler.TABLE_FIELDS, null, data);
     }
 
     public Cursor getFields()
     {
-        Log.i("INSODE DAO  ",  "Table Name=> ");
-
-        return this.handler.getReadableDatabase().rawQuery("SELECT * FROM fields", null);
+        return this.handler.getReadableDatabase().rawQuery("SELECT * FROM " + DBHandler.TABLE_FIELDS, null);
     }
 
     public int updateField(int id, ContentValues data)
@@ -55,15 +53,15 @@ public class Field {
         return this.handler.getReadableDatabase().update("fields", data, "id=" + id, null);
     }
 
-    /**
-     * Get date now
-     *
-     * @return
-     */
-    protected String getDateNow()
+    public long addFieldImage(ContentValues data)
     {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return sdf.format(new Date());
+        String now = this.getDateNow();
+
+        data.put("created_at", now);
+        data.put("updated_at", now);
+
+        return this.handler.getWritableDatabase().insert(DBHandler.TABLE_FIELD_IMAGES, null, data);
     }
+
 
 }

@@ -3,8 +3,11 @@ package com.example.tania_nikos.remotesensing.Database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.io.File;
 
 /**
  * Created by Tania-Nikos on 3/4/2017.
@@ -16,12 +19,12 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "remotesensing.db";
 
     // TABLE NAMES
-    private static final String TABLE_FIELDS = "fields";
-    private static final String TABLE_FIELD_COMMENTS = "field_comments";
-    private static final String TABLE_FIELD_IMAGES = "field_images";
-    private static final String TABLE_EVENTS = "events";
-    private static final String TABLE_EVENTS_COMMENTS = "event_comments";
-    private static final String TABLE_EVENTS_IMAGES = "event_images";
+    public static final String TABLE_FIELDS = "fields";
+    public static final String TABLE_FIELD_COMMENTS = "field_comments";
+    public static final String TABLE_FIELD_IMAGES = "field_images";
+    public static final String TABLE_EVENTS = "events";
+    public static final String TABLE_EVENTS_COMMENTS = "event_comments";
+    public static final String TABLE_EVENTS_IMAGES = "event_images";
 
     // Common column names
     private static final String KEY_ID = "id";
@@ -49,7 +52,7 @@ public class DBHandler extends SQLiteOpenHelper {
     // Field images TABLE
     // id
     public static final String FIELD_IMAGES_FIELD_ID = "field_id";
-    public static final String FIELD_IMAGES_FILENAME = "filename";
+    //public static final String FIELD_IMAGES_FILENAME = "filename";
     public static final String FIELD_IMAGES_FILEPATH = "filepath";
     // created at
     // updated at
@@ -100,9 +103,9 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String CREATE_FIELD_COMMENTS  = "create table " + TABLE_FIELD_COMMENTS + "( "
             + KEY_ID                + " integer primary key autoincrement, "
             + FIELD_COMMENTS_FIELD_IMAGE_ID      + " integer not null,"
-            + FIELD_COMMENTS_TEXT + "text not null,"
-            + KEY_CREATED_AT + "datetime,"
-            + KEY_UPDATED_AT + "datetime,"
+            + FIELD_COMMENTS_TEXT + " text not null,"
+            + KEY_CREATED_AT + " datetime,"
+            + KEY_UPDATED_AT + " datetime,"
             + "FOREIGN KEY ("+FIELD_COMMENTS_FIELD_IMAGE_ID+") REFERENCES "+TABLE_FIELD_IMAGES+"("+KEY_ID+") ON DELETE CASCADE"
             + ");";
 
@@ -110,10 +113,10 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String CREATE_FIELD_IMAGES  = "create table " + TABLE_FIELD_IMAGES + "( "
             + KEY_ID                + " integer primary key autoincrement, "
             + FIELD_IMAGES_FIELD_ID + " integer not null,"
-            + FIELD_IMAGES_FILENAME + " text not null,"
-            + FIELD_IMAGES_FILEPATH + "text not null,"
-            + KEY_CREATED_AT + "datetime,"
-            + KEY_UPDATED_AT + "datetime,"
+          //  + FIELD_IMAGES_FILENAME + " text not null,"
+            + FIELD_IMAGES_FILEPATH + " text not null,"
+            + KEY_CREATED_AT + " datetime,"
+            + KEY_UPDATED_AT + " datetime,"
             + "FOREIGN KEY ("+FIELD_IMAGES_FIELD_ID+") REFERENCES "+ TABLE_FIELDS+"("+KEY_ID+") ON DELETE CASCADE"
             + ");";
 
@@ -137,8 +140,8 @@ public class DBHandler extends SQLiteOpenHelper {
             + KEY_ID                + " integer primary key autoincrement, "
             + EVENT_COMMENTS_EVENT_IMAGE_ID      + " integer not null,"
             + EVENT_COMMENTS_TEXT + "text not null,"
-            + KEY_CREATED_AT + "datetime,"
-            + KEY_UPDATED_AT + "datetime,"
+            + KEY_CREATED_AT + " datetime,"
+            + KEY_UPDATED_AT + " datetime,"
             + "FOREIGN KEY ("+EVENT_COMMENTS_EVENT_IMAGE_ID+") REFERENCES "+ TABLE_EVENTS_IMAGES+"("+KEY_ID+") ON DELETE CASCADE"
             + ");";
 
@@ -148,8 +151,8 @@ public class DBHandler extends SQLiteOpenHelper {
             + EVENT_IMAGES_FIELD_ID + " integer not null,"
             + EVENT_IMAGES_FILENAME + " text not null,"
             + EVENT_IMAGES_FILEPATH + "text not null,"
-            + KEY_CREATED_AT + "datetime,"
-            + KEY_UPDATED_AT + "datetime,"
+            + KEY_CREATED_AT + " datetime,"
+            + KEY_UPDATED_AT + " datetime,"
             + "FOREIGN KEY ("+EVENT_IMAGES_FIELD_ID+") REFERENCES "+ TABLE_EVENTS+"("+KEY_ID+") ON DELETE CASCADE"
             + ");";
 
@@ -164,15 +167,39 @@ public class DBHandler extends SQLiteOpenHelper {
         super(context, name, factory, version);
     }
 
+    /**
+     * Check if the database exist and can be read.
+     *
+     * @return true if it exists and can be read, false if it doesn't
+     */
+    private boolean checkDataBase() {
+        SQLiteDatabase checkDB = null;
+        try {
+            checkDB = SQLiteDatabase.openDatabase(DATABASE_NAME, null,
+                    SQLiteDatabase.OPEN_READONLY);
+            checkDB.close();
+        } catch (SQLiteException e) {
+            // database doesn't exist yet.
+        }
+        return checkDB != null;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(" CREATE DATABASE ", "here");
-        db.execSQL(CREATE_FIELDS);
-        db.execSQL(CREATE_FIELD_COMMENTS);
-        db.execSQL(CREATE_FIELD_IMAGES);
-        db.execSQL(CREATE_EVENTS);
-        db.execSQL(CREATE_EVENT_COMMENTS);
-        db.execSQL(CREATE_EVENT_IMAGES);
+        File dbtest =new File(DATABASE_NAME);
+
+        if (!dbtest.exists()) {
+            Log.i(" CREATE DATABASE ", "create new");
+            db.execSQL(CREATE_FIELDS);
+            db.execSQL(CREATE_FIELD_COMMENTS);
+            db.execSQL(CREATE_FIELD_IMAGES);
+            db.execSQL(CREATE_EVENTS);
+            db.execSQL(CREATE_EVENT_COMMENTS);
+            db.execSQL(CREATE_EVENT_IMAGES);
+        } else {
+            Log.i(" CREATE DATABASE ", "exists");
+
+        }
 
     }
     private static DBHandler sInstance;

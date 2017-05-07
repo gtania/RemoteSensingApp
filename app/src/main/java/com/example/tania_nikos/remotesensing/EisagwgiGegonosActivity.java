@@ -1,5 +1,6 @@
 package com.example.tania_nikos.remotesensing;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -16,6 +17,7 @@ import com.example.tania_nikos.remotesensing.Http.AsyncResponse;
 import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
+import com.example.tania_nikos.remotesensing.Models.Event;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +34,6 @@ public class EisagwgiGegonosActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eisagwgi_gegonos);
-        InternetHandler.checkInternet(this);
     }
 
     /**
@@ -55,54 +56,35 @@ public class EisagwgiGegonosActivity extends ActionBarActivity {
 
 
         // Set up data for post
-        List<NameValuePair> data = new ArrayList<NameValuePair>();
-        data.add(new BasicNameValuePair("onoma_gegonotos", onoma_gegonotos.getText().toString()));
-        data.add(new BasicNameValuePair("perigrafi_gegonotos", perigrafi_gegonotos.getText().toString() ));
-        data.add(new BasicNameValuePair("onoma_xorafiou", onoma_xorafiou.getText().toString()));
-        data.add(new BasicNameValuePair("perioxi_xorafiou", perioxi_xorafiou.getText().toString() ));
-        data.add(new BasicNameValuePair("etos_kaliergias", etos_kaliergias.getText().toString()));
-        data.add(new BasicNameValuePair("onoma_kaliergiti", onoma_kaliergiti.getText().toString()));
-        data.add(new BasicNameValuePair("eidos", eidos_kaliergeias.getText().toString()));
+        ContentValues data = new ContentValues();
+        data.put("device_id", deviceId);
+        data.put("onoma_gegonotos", onoma_gegonotos.getText().toString());
+        data.put("perigrafi_gegonotos", perigrafi_gegonotos.getText().toString());
+        data.put("onoma_xorafiou", onoma_xorafiou.getText().toString());
+        data.put("perioxi_xorafiou", perioxi_xorafiou.getText().toString());
+        data.put("etos_kaliergias", etos_kaliergias.getText().toString());
+        data.put("onoma_kaliergiti", onoma_kaliergiti.getText().toString());
+        data.put("eidos", eidos_kaliergeias.getText().toString());
 
-        HttpPostTask post = new HttpPostTask( HttpTaskHandler.baseUrl + deviceId + "/events", data, new AsyncResponse() {
-            public void processFinish(Response response) {
-                JSONObject jObject = null;
-                try {
-                    jObject = new JSONObject(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("In call TRERERERERRE" + jObject.toString());
+        Event event = new Event(this);
+        long created_id = event.createEvent(data);
+        Spiner.dismiss();
 
-                if (response.status_code == 200) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Εγγραφή επιτυχής",
-                                    Toast.LENGTH_LONG
-                            ).show();
-                        }
-                    });
+        if( created_id == -1){
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Εγγραφή μη επιτυχής",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Εγγραφή επιτυχής",
+                    Toast.LENGTH_LONG
+            ).show();
 
-                    Intent intent = new Intent(EisagwgiGegonosActivity.this, GegonotaActivity.class);
-                    startActivity(intent);
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run()
-                        {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Εγγραφή μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
-                Spiner.dismiss();
-            }
-        });
-
-        new HttpTaskHandler().execute(post);
+            Intent intent = new Intent(EisagwgiGegonosActivity.this, GegonotaActivity.class);
+            startActivity(intent);
+        }
     }
 }

@@ -63,7 +63,6 @@ public class XorafiaActivity extends ActionBarActivity {
 
         Field field = new Field(this);
         final Cursor fieldsCursor = field.getFields();
-                Log.i("IS CURSOR EMPTY ?? => ",  fieldsCursor.getCount() + " => "+ (fieldsCursor == null ? " is null" : " not null"));
 
         if (fieldsCursor != null) {
             ArrayList<String> fields_list = new ArrayList<String>();
@@ -110,10 +109,7 @@ public class XorafiaActivity extends ActionBarActivity {
                         System.out.println("just before change view");
                         startActivity(intent);
                 }
-
             });
-
-
 
         } else {
             Toast.makeText(

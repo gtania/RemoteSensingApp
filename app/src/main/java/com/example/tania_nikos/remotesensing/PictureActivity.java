@@ -50,7 +50,6 @@ public class PictureActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
-        InternetHandler.checkInternet(this);
 
         connect = (Button) findViewById(R.id.button_connect);
         connect.setEnabled(false);
