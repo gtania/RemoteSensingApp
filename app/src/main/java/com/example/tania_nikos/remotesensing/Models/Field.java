@@ -63,5 +63,17 @@ public class Field extends Model {
         return this.handler.getWritableDatabase().insert(DBHandler.TABLE_FIELD_IMAGES, null, data);
     }
 
+    public Cursor getImagesFromFieldWithId(int id)
+    {
+        Log.i("RAW QUERY", "SELECT * FROM " + DBHandler.TABLE_FIELD_IMAGES +" WHERE " + DBHandler.FIELD_IMAGES_FIELD_ID + "="+id);
+        return this.handler
+                .getReadableDatabase()
+                .rawQuery(
+                        "SELECT * FROM " + DBHandler.TABLE_FIELD_IMAGES +" WHERE " + DBHandler.FIELD_IMAGES_FIELD_ID + "=?",
+                        new String[]{Integer.toString(id)}
+                );
+
+    }
+
 
 }

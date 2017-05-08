@@ -2,6 +2,7 @@ package com.example.tania_nikos.remotesensing.ActivitiesProbolis;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
@@ -22,6 +23,7 @@ import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
 import com.example.tania_nikos.remotesensing.MainActivity;
+import com.example.tania_nikos.remotesensing.Models.Event;
 import com.example.tania_nikos.remotesensing.R;
 
 import org.json.JSONArray;
@@ -51,77 +53,47 @@ public class GegonotaProboliActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gegonota_proboli);
-        InternetHandler.checkInternet(this);
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list_gegonota_proboli);
 
         String deviceId = Device.getId(this);
+        Event event = new Event(this);
+        final Cursor eventsCursor = event.getEvents();
+        if ( eventsCursor != null ) {
 
-        HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/events", new AsyncResponse() {
-            public void processFinish(Response response) {
-                // an exei lathi ta emfanizoume
-                try {
-                    //parse response
-                    events = new JSONArray(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            ArrayList<String> events_list = new ArrayList<String>();
 
+            while (eventsCursor.moveToNext()) {
+                events_list.add(
+                        eventsCursor.getString(eventsCursor.getColumnIndex("onoma_gegonotos")) + "\n"
+                                + eventsCursor.getString(eventsCursor.getColumnIndex("onoma_xorafiou")) + "\n"
+                                + eventsCursor.getString(eventsCursor.getColumnIndex("perioxi_xorafiou")) + "\n"
+                                + eventsCursor.getString(eventsCursor.getColumnIndex("etos_kaliergias")) + "\n"
+                                + eventsCursor.getString(eventsCursor.getColumnIndex("onoma_kaliergiti")) + "\n"
+                                + eventsCursor.getString(eventsCursor.getColumnIndex("eidos")) + "\n"
 
-                System.out.println("In Get FIELDS " + events.toString());
-                if (response.status_code == 200) {
-                    final JSONArray finalFields = events;
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ArrayList<String> fields_list = new ArrayList<String>();
-                            for (int i = 0; i < finalFields.length(); i++) {
-                                try {
-                                    JSONObject field = finalFields.getJSONObject(i);
-
-                                    fields_list.add(
-                                            field.getString("onoma_gegonotos") + "\n" +
-                                            field.getString("onoma_xorafiou") + "\n" +
-                                            field.getString("perioxi_xorafiou") + "\n" +
-                                            field.getString("etos_kaliergias") + "\n" +
-                                            field.getString("onoma_kaliergiti") + "\n" +
-                                            field.getString("eidos") + "\n"
-                                    );
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-
-                            // Define a new Adapter
-                            // First parameter - Context
-                            // Second parameter - Layout for the row
-                            // Third parameter - ID of the TextView to which the data is written
-                            // Forth - the Array of data
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(GegonotaProboliActivity.this,
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
-
-                            // Assign adapter to ListView
-                            listView.setAdapter(adapter);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run()
-                        {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Φόρτωση μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
+                );
             }
-        });
-        new HttpTaskHandler().execute(get);
+
+            // Define a new Adapter
+            // First parameter - Context
+            // Second parameter - Layout for the row
+            // Third parameter - ID of the TextView to which the data is written
+            // Forth - the Array of data
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(GegonotaProboliActivity.this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, events_list);
+
+            // Assign adapter to ListView
+            listView.setAdapter(adapter);
+
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Φόρτωση μη επιτυχής",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -132,22 +104,12 @@ public class GegonotaProboliActivity extends ActionBarActivity {
 
                 // ListView Clicked item index
                 int itemPosition     = position;
+                eventsCursor.moveToPosition(position);
+                Integer event_id = eventsCursor.getInt(eventsCursor.getColumnIndex("id"));
 
-                try {
-                    // ListView Clicked item value
-
-                    JSONObject event = events.getJSONObject(position);
-                    /**
-                     * TODO: Pass event gia provoli
-                     */
-
-                    Intent intent = new Intent(GegonotaProboliActivity.this, GegonosProvoliActivity.class);
-                    intent.putExtra("id", event.getInt("id"));
-                    startActivity(intent);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(GegonotaProboliActivity.this, GegonosProvoliActivity.class);
+                intent.putExtra("id", event_id);
+                startActivity(intent);
             }
         });
 

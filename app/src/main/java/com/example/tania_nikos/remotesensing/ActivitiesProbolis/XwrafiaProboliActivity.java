@@ -2,11 +2,13 @@ package com.example.tania_nikos.remotesensing.ActivitiesProbolis;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +25,7 @@ import com.example.tania_nikos.remotesensing.Http.HttpPostTask;
 import com.example.tania_nikos.remotesensing.Http.HttpTaskHandler;
 import com.example.tania_nikos.remotesensing.Http.Response;
 import com.example.tania_nikos.remotesensing.MainActivity;
+import com.example.tania_nikos.remotesensing.Models.Field;
 import com.example.tania_nikos.remotesensing.R;
 
 import org.json.JSONArray;
@@ -52,75 +55,52 @@ public class XwrafiaProboliActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_xwrafia_proboli);
-        InternetHandler.checkInternet(this);
 
                 // Get ListView object from xml
                 listView = (ListView) findViewById(R.id.list_xwrafia_proboli);
         String deviceId = Device.getId(this);
 
-        HttpGetTask get = new HttpGetTask(HttpTaskHandler.baseUrl + deviceId + "/fields", new AsyncResponse() {
-            public void processFinish(Response response) {
-                // an exei lathi ta emfanizoume
-                try {
-                    //parse response
-                    fields = new JSONArray(response.data);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        Field field = new Field(this);
+        final Cursor fieldsCursor = field.getFields();
 
+        if (fieldsCursor != null) {
+            ArrayList<String> fields_list = new ArrayList<String>();
 
-                System.out.println("In Get FIELDS " + fields.toString());
-                if (response.status_code == 200) {
-                    final JSONArray finalFields = fields;
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            ArrayList<String> fields_list = new ArrayList<String>();
-                            for (int i = 0; i < finalFields.length(); i++) {
-                                try {
-                                    JSONObject field = finalFields.getJSONObject(i);
-
-                                    fields_list.add(
-                                            field.getString("onoma_xorafiou") + "\n" +
-                                            field.getString("perioxi_xorafiou") + "\n" +
-                                            field.getString("etos_kaliergias") + "\n" +
-                                            field.getString("onoma_kaliergiti") + "\n" +
-                                            field.getString("eidos") + "\n"
-                                    );
-
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-
-                            // Define a new Adapter
-                            // First parameter - Context
-                            // Second parameter - Layout for the row
-                            // Third parameter - ID of the TextView to which the data is written
-                            // Forth - the Array of data
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XwrafiaProboliActivity.this,
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
-
-                            // Assign adapter to ListView
-                            listView.setAdapter(adapter);
-                        }
-                    });
-                } else {
-                    runOnUiThread(new Runnable() {
-                        public void run()
-                        {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "Φόρτωση μη επιτυχής",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
-                }
+            while (fieldsCursor.moveToNext()) {
+                Log.i(" ITEMS LOOP ", "IN" + fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_xorafiou")));
+                fields_list.add(
+                        fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_xorafiou")) + "\n" +
+                                fieldsCursor.getString(fieldsCursor.getColumnIndex("perioxi_xorafiou")) + "\n" +
+                                fieldsCursor.getString(fieldsCursor.getColumnIndex("etos_kaliergias")) + "\n" +
+                                fieldsCursor.getString(fieldsCursor.getColumnIndex("onoma_kaliergiti")) + "\n" +
+                                fieldsCursor.getString(fieldsCursor.getColumnIndex("eidos")) + "\n"
+                );
             }
-        });
-        new HttpTaskHandler().execute(get);
+
+
+            // Define a new Adapter
+            // First parameter - Context
+            // Second parameter - Layout for the row
+            // Third parameter - ID of the TextView to which the data is written
+            // Forth - the Array of data
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(XwrafiaProboliActivity.this,
+                    android.R.layout.simple_list_item_1, android.R.id.text1, fields_list);
+
+            // Assign adapter to ListView
+            listView.setAdapter(adapter);
+        } else {
+            runOnUiThread(new Runnable() {
+                public void run()
+                {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "Φόρτωση μη επιτυχής",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        }
+
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -131,23 +111,12 @@ public class XwrafiaProboliActivity extends ActionBarActivity {
 
                 // ListView Clicked item index
                 int itemPosition     = position;
+                fieldsCursor.moveToPosition(position);
+                Integer field_id = fieldsCursor.getInt(fieldsCursor.getColumnIndex("id"));
 
-                try {
-                    // ListView Clicked item value
-
-                    JSONObject field = fields.getJSONObject(position);
-                    Integer field_id = field.getInt("id");
-                    /**
-                     *  TODO: pass field gia provoli
-                     */
-
-                    Intent intent = new Intent(XwrafiaProboliActivity.this, XwrafiProboliActivity.class);
-                    intent.putExtra("id", field.getInt("id"));
-                    startActivity(intent);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(XwrafiaProboliActivity.this, XwrafiProboliActivity.class);
+                intent.putExtra("id", field_id);
+                startActivity(intent);
             }
         });
     }

@@ -51,4 +51,14 @@ public class Event extends Model{
 
         return this.handler.getWritableDatabase().insert(DBHandler.TABLE_EVENTS_IMAGES, null, data);
     }
+    public Cursor getImagesFromEventWithId(int id)
+    {
+        return this.handler
+                .getReadableDatabase()
+                .rawQuery(
+                        "SELECT * FROM " + DBHandler.TABLE_EVENTS_IMAGES +" WHERE " + DBHandler.EVENT_IMAGES_FIELD_ID + "=?",
+                        new String[]{Integer.toString(id)}
+                );
+
+    }
 }

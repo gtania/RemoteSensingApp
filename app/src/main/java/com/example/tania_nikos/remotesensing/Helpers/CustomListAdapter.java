@@ -3,6 +3,8 @@ package com.example.tania_nikos.remotesensing.Helpers;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,8 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.utils.DiskCacheUtils;
 import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
+
+import java.io.File;
 
 import static com.example.tania_nikos.remotesensing.R.id.url;
 
@@ -137,7 +141,11 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         String[] datetime_splited = datetime.split(" ");
         txtTitle.setText(datetime_splited[0]);
         //download and display image from url
-        imageLoader.displayImage(urls[position], imageView, options);
+//        imageLoader.displayImage(urls[position], imageView, options);
+        File imgFile = new File(urls[position]);
+        Bitmap myBitmap = BitmapFactory.decodeFile(urls[position]);
+        imageView.setImageBitmap(myBitmap);
+
         Log.d("LOADING URLS", urls[position]);
         extratxt.setText(datetime_splited[1]);
         return rowView;
